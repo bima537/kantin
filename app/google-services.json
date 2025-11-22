@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "390753988082",
+    "project_id": "kantindb-5488c",
+    "storage_bucket": "kantindb-5488c.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:390753988082:android:aa96cf9a76481688e68f6b",
+        "android_client_info": {
+          "package_name": "com.example.kantin"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBm_auL-JY7VwqDwEKsiBkP0x-Zu7V4cEg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
