@@ -15,16 +15,15 @@ fun KantinNavigation() {
     ) {
         composable("login") {
             LoginKantin(
-                onLoginSuccess = {
-                    navController.navigate("home") {
-                        popUpTo("login") {
-                            inclusive = true
-                        }
-                    }
+                onUserLogin = {
+                    navController.navigate("menu_user")
+                },
+                onAdminLogin = {
+                    navController.navigate("menu_admin")
                 }
             )
         }
-        composable("home") {
+        composable("menu_user") {
             HomeKantin()
         }
     }
