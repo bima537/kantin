@@ -84,26 +84,37 @@ fun LoginKantin(
                     coroutineScope.launch {
                         val credential = GoogleAuthProvider.getCredential(idToken, null)
                         try {
-                            // PERBAIKAN 3: Hapus duplikasi auth.signInWithCredential
                             auth.signInWithCredential(credential).await()
 
                             val firebaseUser = auth.currentUser
                             Log.d("FirebaseLogin", "Login sukses: ${firebaseUser?.email}")
 
-                            // Cek Role
                             checkRoleAndNavigate()
 
                         } catch (e: Exception) {
+                            // --- PERUBAHAN DI SINI ---
+                            // Jangan cuma "Gagal Login Google", tapi tampilkan error aslinya
                             Log.w("FirebaseLogin", "Gagal Auth Firebase", e)
-                            Toast.makeText(context, "Gagal Login Google", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(
+                                context,
+                                "Error Firebase: ${e.message}", // Ini akan menampilkan penyebabnya
+                                Toast.LENGTH_LONG
+                            ).show()
                         }
                     }
                 }
             } catch (e: ApiException) {
-                Log.w("GoogleSignIn", "Gagal masuk dengan Google. Status code: ${e.statusCode}", e)
+                // --- PERUBAHAN DI SINI JUGA ---
+                Log.w("GoogleSignIn", "Gagal masuk dengan Google", e)
+                Toast.makeText(
+                    context,
+                    "Error Google API: ${e.statusCode}", // Menampilkan kode 10 atau 12500
+                    Toast.LENGTH_LONG
+                ).show()
             }
         } else {
-            Log.w("GoogleSignIn", "Login Google dibatalkan/gagal. Result: ${result.resultCode}")
+            // Tambahkan info jika user membatalkan atau ada masalah result code
+            Log.w("GoogleSignIn", "Result Code: ${result.resultCode}")
         }
     }
 

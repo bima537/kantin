@@ -12,7 +12,20 @@
           "package_name": "com.example.kantin"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "390753988082-20fg2q97hfr7mrohu93urf7rtc2ea667.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.kantin",
+            "certificate_hash": "4c98051525b8d5010a9d06654ed945bb3877f917"
+          }
+        },
+        {
+          "client_id": "390753988082-2bn1qkla7rbd7vrb378e1ijlguepvmg7.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyBm_auL-JY7VwqDwEKsiBkP0x-Zu7V4cEg"
@@ -20,7 +33,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "390753988082-2bn1qkla7rbd7vrb378e1ijlguepvmg7.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }

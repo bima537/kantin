@@ -25,9 +25,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 
 @Composable
-fun HomeKantin() {
+fun HomeKantin(navController: NavHostController) {
     // Definisi Warna sesuai desain
     val backgroundColor = Color(0xFFFFF5F6)
     val primaryColor = Color(0xFFD68C9A)
@@ -296,6 +298,6 @@ fun FoodDrinkItem(imageRes: Int, name: String) {
 @Composable
 fun HomeKantinPreview() {
     KantinTheme {
-        HomeKantin()
+        HomeKantin(navController = rememberNavController())
     }
 }

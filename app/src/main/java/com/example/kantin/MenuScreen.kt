@@ -12,7 +12,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Fastfood
 import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.MenuBook
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.ReceiptLong
 import androidx.compose.material.icons.filled.Search
@@ -24,11 +23,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 
 // Data Model untuk Menu
 data class MenuItemData(
@@ -41,7 +41,7 @@ data class MenuItemData(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MenuScreen() {
+fun MenuScreen(navController: NavController) {
     // --- WARNA DARI PROJECT ANDA ---
     val backgroundColor = Color(0xFFFFF5F6) // Background Pink Sangat Muda
     val primaryPink = Color(0xFFD68C9A)     // Pink Utama (Header/BottomBar)
@@ -69,108 +69,102 @@ fun MenuScreen() {
 
     var searchText by remember { mutableStateOf("") }
 
-    Scaffold(
-        topBar = {
-            Column {
-                CenterAlignedTopAppBar(
-                    title = {
-                        Text(
-                            text = "Menu",
-                            color = primaryPink,
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 20.sp
-                        )
-                    },
-                    navigationIcon = {
-                        IconButton(onClick = { /* Handle Back Action */ }) {
-                            Icon(
-                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                                contentDescription = "Back",
-                                tint = primaryPink
-                            )
-                        }
-                    },
-                    colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                        containerColor = Color.White
-                    )
+    Column {
+        CenterAlignedTopAppBar(
+            title = {
+                Text(
+                    text = "Menu",
+                    color = primaryPink,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 20.sp
                 )
-                // Garis tipis di bawah header mirip desain
-                HorizontalDivider(thickness = 1.dp, color = primaryPink.copy(alpha = 0.3f))
-            }
-        },
-        bottomBar = {
-            MenuBottomBar(primaryPink)
-        }
-    ) { innerPadding ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(Color.White) // Area konten utama putih
-                .padding(innerPadding)
-                .padding(horizontal = 16.dp)
-        ) {
-            Spacer(modifier = Modifier.height(20.dp))
-
-            // 1. SEARCH BAR
-            OutlinedTextField(
-                value = searchText,
-                onValueChange = { searchText = it },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(56.dp),
-                shape = RoundedCornerShape(12.dp),
-                colors = OutlinedTextFieldDefaults.colors(
-                    unfocusedContainerColor = searchBarBg,
-                    focusedContainerColor = searchBarBg,
-                    unfocusedBorderColor = primaryPink,
-                    focusedBorderColor = primaryPink,
-                    cursorColor = primaryPink
-                ),
-                placeholder = {
-                    Text("Search...", color = primaryPink.copy(alpha = 0.7f))
-                },
-                leadingIcon = {
+            },
+            navigationIcon = {
+                IconButton(onClick = { /* Handle Back Action */ }) {
                     Icon(
-                        imageVector = Icons.Default.Search,
-                        contentDescription = "Search",
-                        tint = Color.White // Icon putih sesuai gambar
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                        contentDescription = "Back",
+                        tint = primaryPink
                     )
                 }
+            },
+            colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                containerColor = Color.White
             )
+        )
+        // Garis tipis di bawah header mirip desain
+        HorizontalDivider(thickness = 1.dp, color = primaryPink.copy(alpha = 0.3f))
+    }
 
-            Spacer(modifier = Modifier.height(16.dp))
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.White) // Area konten utama putih
+            .padding(horizontal = 16.dp)
+    ) {
+        Spacer(modifier = Modifier.height(20.dp))
 
-            // 2. TOMBOL TAMBAH MENU
-            Box(
-                modifier = Modifier.fillMaxWidth(),
-                contentAlignment = Alignment.CenterEnd
-            ) {
-                Button(
-                    onClick = { /* Handle Tambah */ },
-                    colors = ButtonDefaults.buttonColors(containerColor = primaryPink),
-                    shape = RoundedCornerShape(12.dp),
-                    contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)
-                ) {
-                    Text("+ Tambah Menu", color = Color.White, fontWeight = FontWeight.Bold)
-                }
+        // 1. SEARCH BAR
+        OutlinedTextField(
+            value = searchText,
+            onValueChange = { searchText = it },
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(56.dp),
+            shape = RoundedCornerShape(12.dp),
+            colors = OutlinedTextFieldDefaults.colors(
+                unfocusedContainerColor = searchBarBg,
+                focusedContainerColor = searchBarBg,
+                unfocusedBorderColor = primaryPink,
+                focusedBorderColor = primaryPink,
+                cursorColor = primaryPink
+            ),
+            placeholder = {
+                Text("Search...", color = primaryPink.copy(alpha = 0.7f))
+            },
+            leadingIcon = {
+                Icon(
+                    imageVector = Icons.Default.Search,
+                    contentDescription = "Search",
+                    tint = Color.White // Icon putih sesuai gambar
+                )
             }
+        )
 
-            Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(16.dp))
 
-            // 3. LIST ITEM MENU
-            LazyColumn(
-                verticalArrangement = Arrangement.spacedBy(12.dp),
-                contentPadding = PaddingValues(bottom = 20.dp)
+        // 2. TOMBOL TAMBAH MENU
+        Box(
+            modifier = Modifier.fillMaxWidth(),
+            contentAlignment = Alignment.CenterEnd
+        ) {
+            Button(
+                onClick = {
+                    navController.navigate("tambah_menu")
+                },
+                colors = ButtonDefaults.buttonColors(containerColor = primaryPink),
+                shape = RoundedCornerShape(12.dp),
+                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)
             ) {
-                items(menuList) { item ->
-                    MenuItemCard(
-                        item = item,
-                        primaryPink = primaryPink,
-                        editColor = editBtnColor to editTextColor,
-                        deleteColor = deleteBtnColor to deleteTextColor,
-                        activeColor = activeBtnColor to activeTextColor
-                    )
-                }
+                Text("+ Tambah Menu", color = Color.White, fontWeight = FontWeight.Bold)
+            }
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // 3. LIST ITEM MENU
+        LazyColumn(
+            verticalArrangement = Arrangement.spacedBy(12.dp),
+            contentPadding = PaddingValues(bottom = 20.dp)
+        ) {
+            items(menuList) { item ->
+                MenuItemCard(
+                    item = item,
+                    primaryPink = primaryPink,
+                    editColor = editBtnColor to editTextColor,
+                    deleteColor = deleteBtnColor to deleteTextColor,
+                    activeColor = activeBtnColor to activeTextColor
+                )
             }
         }
     }
@@ -340,5 +334,20 @@ fun MenuBottomBar(primaryColor: Color) {
 @Preview(showBackground = true)
 @Composable
 fun MenuScreenPreview() {
-    MenuScreen()
+    val navController = rememberNavController()
+    MaterialTheme {
+        Scaffold(
+            containerColor = Color(0xFFFFF5F6), // Warna background screen
+            bottomBar = {
+                KantinBottomBar(
+                    navController = navController,
+                    primaryColor = Color(0xFFD68C9A)
+                )
+            }
+        ) { paddingValues ->
+            Box(modifier = Modifier.padding(paddingValues)) {
+                MenuScreen(navController = navController)
+            }
+        }
+    }
 }
