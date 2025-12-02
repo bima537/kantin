@@ -23,7 +23,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
+// import androidx.compose.ui.res.stringResource // (Opsional, jika dipakai)
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
@@ -34,7 +34,10 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 
 @Composable
-fun LoginKantin(onLoginSuccess: () -> Unit = {}) {
+fun LoginKantin(
+    onUserLogin: () -> Unit = {},
+    onAdminLogin: () -> Unit = {}
+) {
     val backgroundColor = Color(0xFFFFF6F4)
     val primaryColor = Color(0xFFDE97A5)
     val textColor = Color(0xFF888888)
@@ -42,9 +45,25 @@ fun LoginKantin(onLoginSuccess: () -> Unit = {}) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
 
+    // UID Admin (Pastikan ini benar dari Firebase Console)
+    val adminUid = "3j81LBkUoPOIMlWOfUGbLytfo3m1"
+
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
     val auth: FirebaseAuth = FirebaseAuth.getInstance()
+
+    fun checkRoleAndNavigate() {
+        val currentUser = auth.currentUser
+        if (currentUser != null) {
+            if (currentUser.uid == adminUid) {
+                Log.d("RoleCheck", "Role: Admin")
+                onAdminLogin() // Memanggil callback admin
+            } else {
+                Log.d("RoleCheck", "Role: User")
+                onUserLogin() // Memanggil callback user
+            }
+        }
+    }
 
     val googleSignInClient: GoogleSignInClient = remember {
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -61,8 +80,6 @@ fun LoginKantin(onLoginSuccess: () -> Unit = {}) {
             val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
             try {
                 val account = task.getResult(ApiException::class.java)!!
-                Log.d("GoogleSignIn", "ID Token: ${account.idToken}")
-
                 account.idToken?.let { idToken ->
                     coroutineScope.launch {
                         val credential = GoogleAuthProvider.getCredential(idToken, null)
@@ -70,24 +87,34 @@ fun LoginKantin(onLoginSuccess: () -> Unit = {}) {
                             auth.signInWithCredential(credential).await()
 
                             val firebaseUser = auth.currentUser
-                            Log.d(
-                                "FirebaseLogin",
-                                "Login sukses: ${firebaseUser?.displayName} (${firebaseUser?.email})"
-                            )
-                            onLoginSuccess()
+                            Log.d("FirebaseLogin", "Login sukses: ${firebaseUser?.email}")
+
+                            checkRoleAndNavigate()
+
                         } catch (e: Exception) {
-                            Log.w("FirebaseLogin", "Gagal melakukan autentikasi dengan Firebase", e)
+                            // --- PERUBAHAN DI SINI ---
+                            // Jangan cuma "Gagal Login Google", tapi tampilkan error aslinya
+                            Log.w("FirebaseLogin", "Gagal Auth Firebase", e)
+                            Toast.makeText(
+                                context,
+                                "Error Firebase: ${e.message}", // Ini akan menampilkan penyebabnya
+                                Toast.LENGTH_LONG
+                            ).show()
                         }
                     }
-                } ?: run {
-                    Log.w("GoogleSignIn", "ID Token dari Google adalah null")
                 }
-
             } catch (e: ApiException) {
-                Log.w("GoogleSignIn", "Gagal masuk dengan Google. Status code: ${e.statusCode}", e)
+                // --- PERUBAHAN DI SINI JUGA ---
+                Log.w("GoogleSignIn", "Gagal masuk dengan Google", e)
+                Toast.makeText(
+                    context,
+                    "Error Google API: ${e.statusCode}", // Menampilkan kode 10 atau 12500
+                    Toast.LENGTH_LONG
+                ).show()
             }
         } else {
-            Log.w("GoogleSignIn", "Login Google dibatalkan atau gagal. Result Code: ${result.resultCode}")
+            // Tambahkan info jika user membatalkan atau ada masalah result code
+            Log.w("GoogleSignIn", "Result Code: ${result.resultCode}")
         }
     }
 
@@ -97,7 +124,7 @@ fun LoginKantin(onLoginSuccess: () -> Unit = {}) {
             .fillMaxSize()
             .background(backgroundColor)
     ) {
-        //Header
+        // Header
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -154,10 +181,11 @@ fun LoginKantin(onLoginSuccess: () -> Unit = {}) {
                             try{
                                 auth.signInWithEmailAndPassword(email, password).await()
                                 Log.d("EmailLogin", "Login Berhasil")
-                                onLoginSuccess()
+                                checkRoleAndNavigate()
                             } catch (e: Exception) {
                                 Log.d("EmailLogin", "Login Gagal", e)
-                                Toast.makeText(context, "Login gagal: ${e.localizedMessage}", Toast.LENGTH_LONG).show()
+                                // PERBAIKAN 4: Menambahkan tanda kutip penutup yang hilang
+                                Toast.makeText(context, "Login gagal: ${e.message}", Toast.LENGTH_LONG).show()
                             }
                         }
                     } else {
@@ -194,7 +222,7 @@ fun LoginKantin(onLoginSuccess: () -> Unit = {}) {
             ) {
                 Icon(
                     painter = painterResource(id = R.drawable.google),
-                    contentDescription = " Google Icon",
+                    contentDescription = "Google Icon",
                     modifier = Modifier.size(24.dp),
                     tint = Color.Unspecified
                 )
@@ -204,7 +232,7 @@ fun LoginKantin(onLoginSuccess: () -> Unit = {}) {
             Spacer(modifier = Modifier.height(16.dp))
         }
 
-        //Footer
+        // Footer
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -219,6 +247,6 @@ fun LoginKantin(onLoginSuccess: () -> Unit = {}) {
 @Composable
 fun LoginKantinPreview() {
     KantinTheme {
-        LoginKantin()
+        LoginKantin(onUserLogin = {}, onAdminLogin = {})
     }
 }

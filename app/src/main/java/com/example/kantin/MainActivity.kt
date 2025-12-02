@@ -10,9 +10,8 @@ import androidx.activity.enableEdgeToEdge
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
         setContent {
-            KantinTheme {
+            KantinTheme { // Sesuaikan dengan nama tema project Anda
                 KantinNavigation()
             }
         }
